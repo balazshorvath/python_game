@@ -1,7 +1,6 @@
 """
 Main game loop
 """
-from math import acos, pi, sqrt
 
 import pygame
 from pygame.locals import *
@@ -19,24 +18,17 @@ class Game:
 
     def __init__(self, **kwargs):
         self.__window_size = kwargs.get("windows_size", (800, 600))
-        # config_file = kwargs.get("config")
-
-    #
-    # def tick(self, dt):
-    #     self.__player.update(dt)
 
     def game_loop(self):
-        self.__window_size = (800, 600)
-        self.__player = Player(0, 0, "Player")
         pygame.init()
+        self.__window_size = (800, 600)
         screen = pygame.display.set_mode(self.__window_size)
         clock = pygame.time.Clock()
 
-        player_image = pygame.image.load("data/Player.png").convert_alpha()
-        player_image = pygame.transform.rotate(player_image, -90)
         background = pygame.Surface(screen.get_size()).convert()
         background.fill((30, 200, 30))
 
+        self.__player = Player(1, 1)
         run = True
 
         while run:
@@ -47,27 +39,27 @@ class Game:
                 elif event.type == KEYDOWN or event.type == KEYUP:
                     if event.key == K_w:
                         self.__player.game_action(PlayerActions.MOVE_UP)
-                    if event.key == K_a:
+                    elif event.key == K_a:
                         self.__player.game_action(PlayerActions.MOVE_LEFT)
-                    if event.key == K_s:
+                    elif event.key == K_s:
                         self.__player.game_action(PlayerActions.MOVE_DOWN)
-                    if event.key == K_d:
+                    elif event.key == K_d:
                         self.__player.game_action(PlayerActions.MOVE_RIGHT)
-
-            direction = self.__player.get_direction()
-            self.__player.position = self.__player.position + (direction * (delta_time / 10))
-            # Calculate angle between (1.0, 0.0) and player.direction
-            # They are both normalized =>
-            rot_player = player_image
-            if direction[0] != 0.0 or direction[1] != 0.0:
-                deg = (acos(direction[0] / sqrt(direction[0] ** 2 + direction[1] ** 2)) * 180) / pi
-                if direction[1] > 0.0:
-                    deg = -deg
-                print(deg)
-                rot_player = pygame.transform.rotate(player_image, deg)
+                    elif event.key == K_SPACE:
+                        self.__player.game_action(PlayerActions.USE)
+                    elif K_0 <= event.key <= K_9 and event.type == KEYDOWN:
+                        self.__player.game_action(PlayerActions.PICK, item_index=event.key - K_0)
 
             # print(self.__player.position)
+            self.move_and_collide(delta_time)
             screen.blit(background, (0, 0))
-            screen.blit(rot_player, tuple(self.__player.position))  # , special_flags=pygame.BLEND_RGBA_MULT)
+            self.__player.render(delta_time, screen)
             pygame.display.update()
             clock.tick(60)
+
+    def move_and_collide(self, dt: int):
+        if self.__player.moving:
+
+            new_position = self.__player.position + self.__player.direction_vector * (dt / 10)
+            if 0 < new_position.x < self.__window_size[0] - 32 and 0 < new_position.y < self.__window_size[1] - 32:
+                self.__player.position = new_position
