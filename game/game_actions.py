@@ -1,0 +1,23 @@
+"""
+GameActions
+"""
+from enum import Enum, unique
+
+
+@unique
+class GameActions(Enum):
+    PLAYER_MOVE_UP = 0
+    PLAYER_MOVE_DOWN = 1
+    PLAYER_MOVE_LEFT = 2
+    PLAYER_MOVE_RIGHT = 3
+    PLAYER_USE = 4
+    PLAYER_ITEM_SELECT_0 = 5
+    PLAYER_ITEM_SELECT_1 = 6
+    PLAYER_ITEM_SELECT_2 = 7
+    PLAYER_ITEM_SELECT_3 = 8
+    PLAYER_ITEM_SELECT_4 = 9
+    PLAYER_ITEM_SELECT_5 = 10
+    PLAYER_ITEM_SELECT_6 = 11
+    PLAYER_ITEM_SELECT_7 = 12
+    PLAYER_ITEM_SELECT_8 = 13
+    PLAYER_ITEM_SELECT_9 = 14

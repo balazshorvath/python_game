@@ -1,20 +1,10 @@
 """
 Player
 """
-from enum import Enum, unique
-
 import pygame
 from pygame.math import Vector2
 
-
-@unique
-class PlayerActions(Enum):
-    MOVE_UP = 0
-    MOVE_DOWN = 1
-    MOVE_LEFT = 2
-    MOVE_RIGHT = 3
-    USE = 4
-    PICK = 5
+from .keymap import GameActions
 
 
 class Player:
@@ -50,7 +40,7 @@ class Player:
         self.image_items[0].blit(pygame.image.load("data/Sword.png").convert_alpha(), (0, 0))
         self.image_items[self.current_item].set_alpha(200)
 
-    def game_action(self, player_action: PlayerActions, **kwargs):
+    def game_action(self, player_action: GameActions, **kwargs):
         """
 
         :param player_action: PlayerAction enum
@@ -59,18 +49,18 @@ class Player:
         """
         # for k, v in kwargs:
         print("PlayerAction (%s) inputs: " % player_action, kwargs)
-        if player_action == PlayerActions.MOVE_UP:
+        if player_action == GameActions.PLAYER_MOVE_UP:
             self.up = not self.up
-        elif player_action == PlayerActions.MOVE_DOWN:
+        elif player_action == GameActions.PLAYER_MOVE_DOWN:
             self.down = not self.down
-        elif player_action == PlayerActions.MOVE_LEFT:
+        elif player_action == GameActions.PLAYER_MOVE_LEFT:
             self.left = not self.left
-        elif player_action == PlayerActions.MOVE_RIGHT:
+        elif player_action == GameActions.PLAYER_MOVE_RIGHT:
             self.right = not self.right
-        elif player_action == PlayerActions.USE:
+        elif player_action == GameActions.PLAYER_USE:
             self.attacking = 200
-        elif player_action == PlayerActions.PICK:
-            self.current_item = kwargs.get("item_index", 0)
+        elif GameActions.PLAYER_ITEM_SELECT_0.value <= player_action.value <= GameActions.PLAYER_ITEM_SELECT_9.value:
+            self.current_item = player_action.value - GameActions.PLAYER_ITEM_SELECT_0.value
             for i in self.image_items:
                 i.set_alpha(50)
             self.image_items[self.current_item].set_alpha(200)

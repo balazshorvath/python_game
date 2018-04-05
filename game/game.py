@@ -5,23 +5,24 @@ Main game loop
 import pygame
 from pygame.locals import *
 
-from .player import Player, PlayerActions
+from .keymap import GameActions, Keymap
+from .player import Player
 
 
 class Game:
-    __enemies = []
-    __player = None
-    __objects = None
+    __keymap: Keymap
+    __player: Player = None
 
-    __window_size = None
+    __window_size: tuple = None
     __config = None
 
-    def __init__(self, **kwargs):
-        self.__window_size = kwargs.get("windows_size", (800, 600))
+    def __init__(self, config):
+        default = config["DEFAULT"]
+        self.__window_size = (default.getint("screen_width"), default.getint("screen_height"))
+        self.__keymap = Keymap(default["keymap_config"])
+        pygame.init()
 
     def game_loop(self):
-        pygame.init()
-        self.__window_size = (800, 600)
         screen = pygame.display.set_mode(self.__window_size)
         clock = pygame.time.Clock()
 
@@ -37,18 +38,15 @@ class Game:
                 if event.type == QUIT:
                     run = False
                 elif event.type == KEYDOWN or event.type == KEYUP:
-                    if event.key == K_w:
-                        self.__player.game_action(PlayerActions.MOVE_UP)
-                    elif event.key == K_a:
-                        self.__player.game_action(PlayerActions.MOVE_LEFT)
-                    elif event.key == K_s:
-                        self.__player.game_action(PlayerActions.MOVE_DOWN)
-                    elif event.key == K_d:
-                        self.__player.game_action(PlayerActions.MOVE_RIGHT)
-                    elif event.key == K_SPACE:
-                        self.__player.game_action(PlayerActions.USE)
-                    elif K_0 <= event.key <= K_9 and event.type == KEYDOWN:
-                        self.__player.game_action(PlayerActions.PICK, item_index=event.key - K_0)
+                    action: GameActions = self.__keymap.map_key(event.key)
+                    if action is None:
+                        continue
+                    # Should only happen once per keypress
+                    if GameActions.PLAYER_ITEM_SELECT_0.value <= action.value <= GameActions.PLAYER_ITEM_SELECT_9.value \
+                            and event.type == KEYDOWN:
+                        self.__player.game_action(action)
+                    else:
+                        self.__player.game_action(action)
 
             # print(self.__player.position)
             self.move_and_collide(delta_time)
