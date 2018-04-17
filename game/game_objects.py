@@ -39,7 +39,6 @@ class Item(GameObject):
         pass
 
 
-
 class Obstacle:
     position: tuple
     size: tuple
